@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Param, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/auth/get-user.decorator';
 import { User } from 'src/auth/user.entity';
@@ -17,5 +17,10 @@ export class TweetsController {
 		@GetUser() user: User
 	): Promise<Tweet> {
 		return this.tweetsService.createTweet(createTweetDto, user);
+	}
+
+	@Delete('/:id')
+	deleteTweet(@Param('id') id: string, @GetUser() user: User): Promise<void> {
+		return this.tweetsService.deleteTweet(id, user);
 	}
 }

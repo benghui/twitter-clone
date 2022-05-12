@@ -11,7 +11,6 @@ import { TweetsModule } from './tweets/tweets.module';
       envFilePath: [`.env.stage.${process.env.STAGE}`],
       validationSchema: configValidationSchema,
     }),
-    TweetsModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -34,6 +33,7 @@ import { TweetsModule } from './tweets/tweets.module';
         };
       },
     }),
+    TweetsModule,
     AuthModule,
   ],
 })
