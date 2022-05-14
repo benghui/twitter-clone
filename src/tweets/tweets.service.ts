@@ -12,6 +12,16 @@ export class TweetsService {
 		private tweetsRepository: TweetsRepository,
 	) { }
 
+	async getTweetById(id: string, user: User): Promise<Tweet> {
+		const found = await this.tweetsRepository.findOne({ where: { id, user } });
+
+		if(!found) {
+			throw new NotFoundException(`Tweet with ID "${id}" not found`);
+		}
+
+		return found;
+	}
+
 	createTweet(createTweetDto: CreateTweetDto, user: User): Promise<Tweet> {
 		return this.tweetsRepository.createTweet(createTweetDto, user);
 	}
