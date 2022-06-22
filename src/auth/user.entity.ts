@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Follower } from "../followers/follower.entity";
 
 @Entity()
 export class User {
@@ -16,4 +17,10 @@ export class User {
 
 	@UpdateDateColumn()
 	updatedDate: Date
+
+	@OneToMany((_type) => Follower, (follower) => follower.following)
+	followers: Follower[];
+
+	@OneToMany((_type) => Follower, (follower) => follower.followers)
+	following: Follower[];
 }

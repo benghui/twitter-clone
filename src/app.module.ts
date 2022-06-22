@@ -4,6 +4,7 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { configValidationSchema } from './config.schema';
 import { TweetsModule } from './tweets/tweets.module';
+import { FollowersModule } from './followers/followers.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { TweetsModule } from './tweets/tweets.module';
     }),
     TweetsModule,
     AuthModule,
+    FollowersModule,
   ],
 })
 export class AppModule {}

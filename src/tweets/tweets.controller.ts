@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { GetUser } from 'src/auth/get-user.decorator';
-import { User } from 'src/auth/user.entity';
+import { GetUser } from '../auth/get-user.decorator';
+import { User } from '../auth/user.entity';
 import { CreateTweetDto } from './dto/create-tweet.dto';
 import { GetTweetsFilterDto } from './dto/get-tweets-filter.dto';
 import { Tweet } from './tweet.entity';
