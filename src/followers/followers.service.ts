@@ -4,6 +4,7 @@ import { UsersRepository } from 'src/auth/users.repository';
 import { Follower } from './follower.entity';
 import { User } from '../auth/user.entity';
 import { FollowersRepository } from './followers.repository';
+import { getConnection } from 'typeorm';
 
 @Injectable()
 export class FollowersService {
@@ -23,5 +24,21 @@ export class FollowersService {
 		}
 
 		return this.followersRepository.addFollowUser(followingUser, user);
+	}
+
+	async removeFollowUser(deleteUserToFollow: string, user: User): Promise<void> {
+		const followingUser = await this.usersRepository.findOne({ where: { username: deleteUserToFollow } })
+
+		if (!followingUser) {
+			throw new NotFoundException(`User with username "${deleteUserToFollow}" not found`);
+		}
+
+		await getConnection()
+			.createQueryBuilder()
+			.delete()
+			.from(Follower)
+			.where("followers_id = :id", { id: user.id })
+			.andWhere("following_id = :fid", { fid: followingUser.id })
+			.execute()
 	}
 }

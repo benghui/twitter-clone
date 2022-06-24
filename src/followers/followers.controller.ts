@@ -14,4 +14,9 @@ export class FollowersController {
 	addFollowUser(@Param('username') addUserToFollow: string, @GetUser() user: User): Promise<Follower> {
 		return this.followersService.addFollowUser(addUserToFollow, user);
 	}
+
+	@Post('/:username/unfollow')
+	removeFollowUser(@Param('username') deleteUserToFollow: string, @GetUser() user: User): Promise<void> {
+		return this.followersService.removeFollowUser(deleteUserToFollow, user);
+	}
 }
