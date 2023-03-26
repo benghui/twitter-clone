@@ -1,4 +1,6 @@
+import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { User } from '../auth/user.entity';
 import { GetTweetsFilterDto } from './dto/get-tweets-filter.dto';
 import { Tweet } from './tweet.entity';
 import { TweetsRepository } from './tweets.repository';
@@ -41,6 +43,36 @@ describe('TweetsService', () => {
 
       expect(tweetsRepository.getTweets).toHaveBeenCalledWith(filterDto);
       expect(result).toEqual(tweets);
+    });
+  });
+
+  describe('getTweetById', () => {
+    const mockUser: User = {
+      id: '1',
+      username: 'testuser',
+    } as any;
+
+    const mockTweet: Tweet = {
+      id: '1',
+      tweet_body: 'mocktweet',
+      user: mockUser,
+      createdDate: new Date(),
+    };
+
+    it('should return a tweet', async () => {
+      jest.spyOn(tweetsRepository, 'findOne').mockResolvedValue(mockTweet);
+
+      const result = await tweetsService.getTweetById(mockTweet.id, mockUser);
+
+      expect(result).toEqual(mockTweet);
+    });
+
+    it('should throw a NotFoundException if the tweet is not found', async () => {
+      jest.spyOn(tweetsRepository, 'findOne').mockResolvedValue(null);
+
+      expect(
+        tweetsService.getTweetById('invalid_id', mockUser),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });
