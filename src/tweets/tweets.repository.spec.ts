@@ -3,6 +3,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TweetsRepository } from './tweets.repository';
 import { GetTweetsFilterDto } from './dto/get-tweets-filter.dto';
 import { Tweet } from './tweet.entity';
+import { User } from '../auth/user.entity';
+import { CreateTweetDto } from './dto/create-tweet.dto';
 
 describe('TweetsRepository', () => {
   let tweetsRepository: TweetsRepository;
@@ -49,6 +51,40 @@ describe('TweetsRepository', () => {
       await expect(tweetsRepository.getTweets(filterDto)).rejects.toThrow(
         InternalServerErrorException,
       );
+    });
+  });
+
+  describe('createTweet', () => {
+    const mockUser = new User();
+    mockUser.id = '1';
+    mockUser.username = 'testuser';
+    mockUser.password = 'testpassword';
+
+    const mockCreateTweetDto: CreateTweetDto = {
+      tweet_body: 'test tweet',
+    };
+
+    it('should create a new tweet', async () => {
+      const result = new Tweet();
+      result.id = '1';
+      result.tweet_body = 'test tweet';
+      result.user = mockUser;
+
+      jest.spyOn(tweetsRepository, 'create').mockReturnValue(result);
+      jest.spyOn(tweetsRepository, 'save').mockResolvedValue(null);
+
+      const tweet = await tweetsRepository.createTweet(
+        mockCreateTweetDto,
+        mockUser,
+      );
+
+      expect(tweetsRepository.create).toHaveBeenCalledWith({
+        tweet_body: 'test tweet',
+        user: mockUser,
+      });
+
+      expect(tweetsRepository.save).toHaveBeenCalledWith(result);
+      expect(tweet).toEqual(result);
     });
   });
 });
