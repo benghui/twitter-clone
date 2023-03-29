@@ -68,11 +68,12 @@ describe('TweetsService', () => {
     });
 
     it('should throw a NotFoundException if the tweet is not found', async () => {
+      const id = 'invalid_id';
       jest.spyOn(tweetsRepository, 'findOne').mockResolvedValue(null);
 
-      expect(
-        tweetsService.getTweetById('invalid_id', mockUser),
-      ).rejects.toThrow(NotFoundException);
+      expect(tweetsService.getTweetById(id, mockUser)).rejects.toThrowError(
+        new NotFoundException(`Tweet with ID "${id}" not found`),
+      );
     });
   });
 });
