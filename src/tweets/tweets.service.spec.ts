@@ -1,6 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { User } from '../auth/user.entity';
+import { CreateTweetDto } from './dto/create-tweet.dto';
 import { GetTweetsFilterDto } from './dto/get-tweets-filter.dto';
 import { Tweet } from './tweet.entity';
 import { TweetsRepository } from './tweets.repository';
@@ -74,6 +75,35 @@ describe('TweetsService', () => {
       expect(tweetsService.getTweetById(id, mockUser)).rejects.toThrowError(
         new NotFoundException(`Tweet with ID "${id}" not found`),
       );
+    });
+  });
+
+  describe('createTweet', () => {
+    const createTweetDto: CreateTweetDto = {
+      tweet_body: 'mockTweet',
+    };
+
+    const user: User = { id: '1', username: 'testuser' } as any;
+
+    it('should create a tweet and return it', async () => {
+      const createdTweet: Tweet = {
+        id: '1',
+        ...createTweetDto,
+        user,
+        createdDate: new Date(),
+      };
+
+      jest
+        .spyOn(tweetsRepository, 'createTweet')
+        .mockResolvedValue(createdTweet);
+
+      const result = await tweetsService.createTweet(createTweetDto, user);
+
+      expect(tweetsRepository.createTweet).toHaveBeenCalledWith(
+        createTweetDto,
+        user,
+      );
+      expect(result).toEqual(createdTweet);
     });
   });
 });
