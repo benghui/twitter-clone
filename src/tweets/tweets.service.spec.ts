@@ -8,7 +8,9 @@ import { TweetsRepository } from './tweets.repository';
 import { TweetsService } from './tweets.service';
 
 describe('TweetsService', () => {
-  let tweetsService: TweetsService, tweetsRepository: TweetsRepository;
+  let tweetsService: TweetsService,
+    tweetsRepository: TweetsRepository,
+    mockUser: User;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -17,6 +19,8 @@ describe('TweetsService', () => {
 
     tweetsService = module.get<TweetsService>(TweetsService);
     tweetsRepository = module.get<TweetsRepository>(TweetsRepository);
+
+    mockUser = { id: '1', username: 'mockuser' } as any;
   });
 
   describe('getTweets', () => {
@@ -28,13 +32,13 @@ describe('TweetsService', () => {
         {
           id: '1',
           tweet_body: 'tweet1',
-          user: { id: '1', username: 'mockuser' },
+          user: mockUser,
           createdDate: new Date(),
         },
         {
           id: '2',
           tweet_body: 'tweet2',
-          user: { id: '1', username: 'mockuser' },
+          user: mockUser,
           createdDate: new Date(),
         },
       ] as any;
@@ -48,11 +52,6 @@ describe('TweetsService', () => {
   });
 
   describe('getTweetById', () => {
-    const mockUser: User = {
-      id: '1',
-      username: 'testuser',
-    } as any;
-
     const mockTweet: Tweet = {
       id: '1',
       tweet_body: 'mocktweet',
@@ -83,13 +82,11 @@ describe('TweetsService', () => {
       tweet_body: 'mockTweet',
     };
 
-    const user: User = { id: '1', username: 'testuser' } as any;
-
     it('should create a tweet and return it', async () => {
       const createdTweet: Tweet = {
         id: '1',
         ...createTweetDto,
-        user,
+        user: mockUser,
         createdDate: new Date(),
       };
 
@@ -97,13 +94,42 @@ describe('TweetsService', () => {
         .spyOn(tweetsRepository, 'createTweet')
         .mockResolvedValue(createdTweet);
 
-      const result = await tweetsService.createTweet(createTweetDto, user);
+      const result = await tweetsService.createTweet(createTweetDto, mockUser);
 
       expect(tweetsRepository.createTweet).toHaveBeenCalledWith(
         createTweetDto,
-        user,
+        mockUser,
       );
       expect(result).toEqual(createdTweet);
+    });
+  });
+
+  describe('deleteTweet', () => {
+    const id = '1';
+
+    it('should delete a tweet', async () => {
+      jest
+        .spyOn(tweetsRepository, 'delete')
+        .mockResolvedValue({ affected: 1 } as any);
+
+      await tweetsService.deleteTweet(id, mockUser);
+
+      expect(tweetsRepository.delete).toHaveBeenCalledWith({
+        id,
+        user: mockUser,
+      });
+    });
+
+    it('should throw a NotFoundException if tweet is not found', async () => {
+      jest
+        .spyOn(tweetsRepository, 'delete')
+        .mockResolvedValue({ affected: 0 } as any);
+
+      await expect(
+        tweetsService.deleteTweet(id, mockUser),
+      ).rejects.toThrowError(
+        new NotFoundException(`Tweet with ID "${id}" not found`),
+      );
     });
   });
 });
